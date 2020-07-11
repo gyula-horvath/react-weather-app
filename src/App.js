@@ -1,26 +1,122 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import './App.css'
+import 'weather-icons/css/weather-icons.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+import Weather from './components/weather.component';
+
+const API_key = 'fd9fb084a09d8b5949e8d196f037950d';
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      city: undefined,
+      country: "",
+      icon: undefined,
+      main: undefined,
+      celsius: undefined,
+      temp_max: undefined,
+      temp_min: undefined,
+      description: "",
+      error: false
+    };
+    this.getWeather();
+
+    this.weatherIcon={
+      Thunderstorm: "wi-thunderstorm",
+      Drizzle: "wi-sleet",
+      Rain: "wi-storm-showers",
+      Snow: "wi-snow",
+      Atmosphere: "wi-fog",
+      Clear: "wi-day-sunny",
+      Clouds: "wi-day-fog"
+    }
+  }
+
+  calCelsius(temp){
+    let celsius = Math.floor(temp - 273.15);
+    return celsius;
+  }
+
+  getWeatherIcon(icons, id){
+    switch(true){
+      case id >= 200 && id <= 232: 
+      this.setState({
+        icon: this.weatherIcon.Thunderstorm
+      })
+      break;
+      case id >= 300 && id <= 321: 
+      this.setState({
+        icon: this.weatherIcon.Drizzle
+      })
+      break;
+      case id >= 500 && id <= 531: 
+      this.setState({
+        icon: this.weatherIcon.Rain
+      })
+      break;
+      case id >= 600 && id <= 622: 
+      this.setState({
+        icon: this.weatherIcon.Snow
+      })
+      break;
+      case id >= 700 && id <= 781: 
+      this.setState({
+        icon: this.weatherIcon.Atmosphere
+      })
+      break;
+      case id === 800: 
+      this.setState({
+        icon: this.weatherIcon.Clear
+      })
+      break;
+      case id >= 801 && id <= 804: 
+      this.setState({
+        icon: this.weatherIcon.Clouds
+      })
+      break;
+      default: this.setState({
+        icon: this.weatherIcon.Clouds
+      })
+      break;
+    }
+  }
+
+  getWeather = async () => {
+    const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=Budapest,hu&appid=${API_key}`)
+
+    const response = await api_call.json();
+
+    console.log(response);
+
+    this.setState({
+      city: response.name,
+      country: response.sys.country,
+      celsius: this.calCelsius(response.main.temp),
+      temp_min: this.calCelsius(response.main.temp_min),
+      temp_max: this.calCelsius(response.main.temp_max),
+      description: response.weather[0].description
+    })
+
+    this.getWeatherIcon(this.weatherIcon, response.weather[0].id)
+  }
+  render() {
+    return (
+      <div className="App">
+        <Weather
+          city={this.state.city}
+          country={this.state.country}
+          temp_celsius={this.state.celsius}
+          temp_min={this.state.temp_min}
+          temp_max={this.state.temp_max}
+          description={this.state.description}
+          weatherIcon={this.state.icon}
+        />
+      </div>
+    );
+  }
 }
 
 export default App;
