@@ -1,3 +1,7 @@
+## Weather Forecast app
+
+This is an app that tells you the weather forecast of the city and country hat you enter.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
