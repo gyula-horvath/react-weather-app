@@ -34,6 +34,14 @@ class App extends React.Component {
     }
   }
 
+  countryChecker(country){
+    console.log(country)
+    if(country.match(/Ireland/) || country.match(/ireland/)){
+      console.log("ok");
+      return "ie";
+    }
+  }
+
   calCelsius(temp) {
     let celsius = Math.floor(temp - 273.15);
     return celsius;
@@ -88,14 +96,12 @@ class App extends React.Component {
     e.preventDefault();
 
     const city = e.target.elements.city.value;
-    const country = e.target.elements.country.value;
+    const country = this.countryChecker(e.target.elements.country.value);
 
     if (city && country) {
       const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_key}`)
 
       const response = await api_call.json();
-
-      console.log(response);
 
       this.setState({
         city: `${response.name}, ${response.sys.country}`,
